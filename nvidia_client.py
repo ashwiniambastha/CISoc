@@ -139,7 +139,7 @@ def _now() -> str:
 
 
 def _blank_row() -> Dict[str, Any]:
-    return {col: "" for col in config.COLUMNS}
+    return {col: "" for col in config.RECORD_FIELDS}
 
 
 def apply_frame(prompt_text: str, language: str) -> tuple:

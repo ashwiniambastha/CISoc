@@ -46,11 +46,23 @@ MODELS = {
 }
 
 # --- Elicitation protocol (spec section 4) --------------------------------
+# DEFAULT_REPLICATES is the n that Appendix B.1 says the pilot exists to
+# calibrate. It is the only thing that gives you within-prompt stability p-hat,
+# and the 70% recurrence rule is computed against it. Lowering it to 3 makes
+# the threshold 2/3 = 67% or 3/3 = 100%, with nothing in between.
 DEFAULT_REPLICATES = 8          # temperature left unset
 DETERMINISM_REPLICATES = 1      # temperature = 0
 DETERMINISM_TEMPERATURE = 0.0
 DETERMINISM_TOP_P = 1.0
 DETERMINISM_SEED = 42           # honoured only if the endpoint supports seeding
+
+# --- Temperature sweep (exploratory, NOT the protocol run) ----------------
+# A separate condition, logged as condition="sweep" with the actual temperature
+# on every row. Sweep rows are not pooled with `default` rows: the default
+# condition is defined by sending no temperature at all, which is not the same
+# event as sending a number that happens to match the provider's default.
+SWEEP_TEMPERATURES = [0.0, 0.7, 1.4]
+SWEEP_REPLICATES = 1            # replicates per temperature
 
 # Identical across both models, recorded on every row (Appendix C.7.3).
 MAX_TOKENS = 4096
@@ -107,39 +119,63 @@ MANIFEST_PATH = LOG_DIR / "run_manifest.json"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # --- Log schema (spec section 6, plus Appendix C hygiene fields) ----------
-COLUMNS = [
-    "record_id",
-    "timestamp",
-    "source",              # batch | dashboard
+# RECORD_FIELDS is what every log record contains and what goes to the JSONL.
+# EXCEL_COLUMNS (below) is the narrower view written to the spreadsheet. They
+# are deliberately separate: hiding a column from the sheet should never delete
+# it from the record.
+#
+# Ordered for reading, not for machine convenience: what a coder needs to see
+# without scrolling comes first — which prompt, in which language, to which
+# model, what was sent, what came back. Housekeeping trails at the right.
+RECORD_FIELDS = [
+    # --- what was asked -----------------------------------------------
     "prompt_id",
-    "family",
+    "language",            # EN | HI | HG
     "arm",                 # test | control
+    "prompt_text",         # the bank prompt, unmodified
+    "prompt_sent",         # what actually went over the wire, frame included
+    # --- who was asked, and how ---------------------------------------
+    "model_name",          # nemotron | gpt_oss
+    "condition",           # default | determinism | sweep | manual
+    "temperature",         # value sent, or "unset"
+    "replicate_index",
+    # --- what came back ------------------------------------------------
+    "response_text",       # verbatim response, or error message if failed
+    "status",              # success | failed
+    "truncated",
+    "response_chars",
+    "total_tokens",
+    # --- context -------------------------------------------------------
+    "family",
     "form",                # contrastive | classification | boundary
     "paraphrase",          # a | b
-    "language",            # EN | HI | HG
-    "model_name",          # nemotron | gpt_oss
-    "model_id_sent",
-    "model_id_returned",
-    "condition",           # default | determinism
     "frame_id",            # none | brief-v1 ... never pool across values
     "frame_text",          # the exact instruction appended, verbatim
-    "replicate_index",
-    "temperature",         # value sent, or "unset"
-    "top_p",
-    "max_tokens",
-    "status",              # success | failed
-    "finish_reason",
-    "truncated",
-    "attempt",             # 1 = first try, 2 = the single retry
-    "response_text",       # verbatim response, or error message if failed
-    "response_chars",
+    "timestamp",
+    "source",              # batch | dashboard
+    # --- housekeeping ---------------------------------------------------
     "prompt_tokens",
     "completion_tokens",
-    "total_tokens",
     "latency_seconds",
+    "finish_reason",
+    "attempt",             # 1 = first try, 2 = the single retry
+    "top_p",
+    "max_tokens",
+    "model_id_sent",
+    "model_id_returned",
     "order_seed",
     "bank_version",
     "bank_sha256",
-    "prompt_text",         # the bank prompt, unmodified
-    "prompt_sent",         # what actually went over the wire, frame included
+    "record_id",
 ]
+
+# Columns actually written to run_log.xlsx. Anything listed here is a view of
+# RECORD_FIELDS; anything left out is still captured in run_log.jsonl.
+#
+# prompt_sent is hidden because it duplicates prompt_text once the frame is
+# known — and the frame is recoverable from frame_id / frame_text, which stay.
+EXCEL_HIDDEN = ["prompt_sent"]
+EXCEL_COLUMNS = [c for c in RECORD_FIELDS if c not in EXCEL_HIDDEN]
+
+# Back-compat alias: existing code that says config.COLUMNS means the record.
+COLUMNS = RECORD_FIELDS

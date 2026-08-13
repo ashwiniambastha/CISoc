@@ -29,8 +29,10 @@ _ILLEGAL = re.compile(r"[\000-\010\013\014\016-\037]")
 _CELL_LIMIT = 32_000
 
 _WIDTHS = {
-    "response_text": 80,
-    "prompt_text": 46,
+    "response_text": 90,
+    "prompt_text": 40,
+    "prompt_sent": 40,
+    "frame_text": 26,
     "record_id": 12,
     "timestamp": 22,
     "prompt_id": 12,
@@ -39,6 +41,12 @@ _WIDTHS = {
     "model_id_returned": 26,
     "bank_sha256": 18,
 }
+
+# Long text is stored in full but a normal-height row shows only its first
+# line. These columns get wrap-text so the whole response is readable in place.
+_WRAP_COLUMNS = {"response_text", "prompt_text", "prompt_sent", "frame_text"}
+_WRAP = Alignment(wrap_text=True, vertical="top")
+_TOP = Alignment(vertical="top")
 
 
 # --------------------------------------------------------------------------
@@ -58,39 +66,65 @@ def _clean(value: Any) -> Any:
     return text
 
 
+def _style_row(ws, row_idx: int) -> None:
+    """Wrap the long-text cells so the full response is visible in the sheet.
+
+    Row height is left unset so Excel auto-fits to the wrapped content.
+    """
+    for i, col in enumerate(config.EXCEL_COLUMNS, start=1):
+        ws.cell(row=row_idx, column=i).alignment = (
+            _WRAP if col in _WRAP_COLUMNS else _TOP
+        )
+
+
 def ensure_workbook(path: Path = None) -> Path:
     path = Path(path or config.EXCEL_LOG_PATH)
     if path.exists():
         # A schema change would otherwise shift every value one column left
         # from the row it was appended on, silently.
         header = [c.value for c in load_workbook(path, read_only=True)["elicitations"][1]]
-        if header != config.COLUMNS:
-            missing = [c for c in config.COLUMNS if c not in header]
-            extra = [c for c in header if c not in config.COLUMNS]
+        if header != config.EXCEL_COLUMNS:
+            missing = [c for c in config.EXCEL_COLUMNS if c not in header]
+            extra = [c for c in header if c not in config.EXCEL_COLUMNS]
+            if not missing and not extra:
+                raise RuntimeError(
+                    f"\n{path.name} has the same columns in a different order.\n"
+                    f"Run:  python verify_log.py --rebuild\n"
+                    f"That regenerates the sheet from run_log.jsonl in the new "
+                    f"order. No data is lost and nothing is re-elicited."
+                )
             raise RuntimeError(
                 f"\n{path.name} was written under a different schema.\n"
                 f"  new columns: {missing or 'none'}\n"
                 f"  dropped:     {extra or 'none'}\n"
-                f"Rename the old log (e.g. run_log_pre_frame.xlsx, and the .jsonl\n"
-                f"alongside it) and let a fresh one be created. Rows from before a\n"
-                f"schema or frame change are a separate run and should not be pooled\n"
-                f"with what follows."
+                f"If only columns were added, run:  python verify_log.py --rebuild\n"
+                f"If the frame or the bank changed, archive the old log instead —\n"
+                f"rows from before such a change are a separate run and should not\n"
+                f"be pooled with what follows."
             )
         return path
     path.parent.mkdir(parents=True, exist_ok=True)
+    _new_workbook().save(path)
+    return path
+
+
+def _new_workbook() -> Workbook:
+    """An empty, styled workbook with the current schema as its header."""
     wb = Workbook()
     ws = wb.active
     ws.title = "elicitations"
-    ws.append(config.COLUMNS)
-    for i, col in enumerate(config.COLUMNS, start=1):
+    ws.append(config.EXCEL_COLUMNS)
+    for i, col in enumerate(config.EXCEL_COLUMNS, start=1):
         cell = ws.cell(row=1, column=i)
         cell.font = Font(bold=True)
-        cell.alignment = Alignment(vertical="center")
+        cell.alignment = Alignment(vertical="center", wrap_text=True)
         ws.column_dimensions[get_column_letter(i)].width = _WIDTHS.get(col, 15)
-    ws.freeze_panes = "A2"
-    ws.auto_filter.ref = f"A1:{get_column_letter(len(config.COLUMNS))}1"
-    wb.save(path)
-    return path
+    ws.row_dimensions[1].height = 28
+    # Freeze the identifying columns as well as the header, so prompt_id and
+    # language stay on screen while scrolling right through the response.
+    ws.freeze_panes = "D2"
+    ws.auto_filter.ref = f"A1:{get_column_letter(len(config.EXCEL_COLUMNS))}1"
+    return wb
 
 
 # Both models are called concurrently from the dashboard; two threads opening
@@ -127,7 +161,8 @@ def _append_locked(rows, excel_path: Path, jsonl_path: Path) -> int:
         wb = load_workbook(excel_path)
         ws = wb["elicitations"]
         for row in rows:
-            ws.append([_clean(row.get(col, "")) for col in config.COLUMNS])
+            ws.append([_clean(row.get(col, "")) for col in config.EXCEL_COLUMNS])
+            _style_row(ws, ws.max_row)
         wb.save(excel_path)
     except PermissionError:
         # Almost always: the file is open in Excel. Never lose the data.
@@ -138,7 +173,7 @@ def _append_locked(rows, excel_path: Path, jsonl_path: Path) -> int:
         wb = load_workbook(sidecar)
         ws = wb["elicitations"]
         for row in rows:
-            ws.append([_clean(row.get(col, "")) for col in config.COLUMNS])
+            ws.append([_clean(row.get(col, "")) for col in config.EXCEL_COLUMNS])
         wb.save(sidecar)
         print(
             f"  [warn] {excel_path.name} is locked (open in Excel?). "
@@ -154,6 +189,33 @@ append_row = lambda row, **kw: append_rows([row], **kw)  # noqa: E731
 # --------------------------------------------------------------------------
 # Reading back
 # --------------------------------------------------------------------------
+
+
+def rebuild_excel(excel_path: Path = None, jsonl_path: Path = None) -> int:
+    """Regenerate the whole spreadsheet from the JSONL.
+
+    The JSONL stores dicts, so it is column-order independent — which makes it
+    the thing to rebuild from whenever the schema is reordered or extended.
+    No data is re-elicited and nothing is lost.
+    """
+    excel_path = Path(excel_path or config.EXCEL_LOG_PATH)
+    jsonl_path = Path(jsonl_path or config.JSONL_LOG_PATH)
+    rows = read_all(jsonl_path)
+
+    if excel_path.exists():
+        backup = excel_path.with_name(f"{excel_path.stem}_prev{excel_path.suffix}")
+        try:
+            backup.write_bytes(excel_path.read_bytes())
+        except OSError:
+            pass
+
+    wb = _new_workbook()                      # fresh, in memory
+    ws = wb["elicitations"]
+    for row in rows:
+        ws.append([_clean(row.get(col, "")) for col in config.EXCEL_COLUMNS])
+        _style_row(ws, ws.max_row)
+    wb.save(excel_path)                       # overwrite in place, no delete
+    return len(rows)
 
 
 def read_all(jsonl_path: Path = None) -> List[Dict[str, Any]]:
@@ -195,6 +257,40 @@ def completed_keys(jsonl_path: Path = None) -> Set[Tuple]:
                 )
             )
     return keys
+
+
+def next_replicate_index(
+    prompt_id: str,
+    model_name: str,
+    condition: str,
+    temperature: Any = None,
+    source: str = "dashboard",
+    jsonl_path: Path = None,
+) -> int:
+    """Next free replicate number for this cell.
+
+    Without this every dashboard click writes replicate_index = 1 and repeat
+    elicitations of the same prompt are indistinguishable in the log — which
+    makes within-prompt stability impossible to compute from dashboard rows.
+
+    Call this from the main thread before fanning out, not inside a worker:
+    two threads reading the log at once would both get the same number.
+    """
+    used = []
+    for r in read_all(jsonl_path):
+        if (
+            r.get("prompt_id") == prompt_id
+            and r.get("model_name") == model_name
+            and r.get("condition") == condition
+            and r.get("source") == source
+        ):
+            if temperature is not None and str(r.get("temperature")) != str(temperature):
+                continue
+            try:
+                used.append(int(r.get("replicate_index") or 0))
+            except (TypeError, ValueError):
+                continue
+    return max(used, default=0) + 1
 
 
 def summarise(jsonl_path: Path = None) -> Dict[str, Any]:

@@ -87,16 +87,11 @@ with st.sidebar:
     run_nine = st.button("Run all 9 elicitations", width="stretch",
                          help="8 at provider default + 1 at temperature 0, "
                               "through the same rate limiter as the batch runner")
-    st.caption(f"bank {bank['bank_version']} · {len(prompts)} prompts · "
-               f"sha {bank['sha256'][:12]}… · max_tokens {config.MAX_TOKENS}")
+    
 
     if config.USE_BREVITY_FRAME:
         st.warning(
-            f"**Frame `{config.BREVITY_FRAME_ID}` is active.** A length "
-            f"instruction is appended to every prompt, in the prompt's own "
-            f"language. This is priming: it is logged in `frame_id` / "
-            f"`frame_text`, and its effect on the assertion rate has to be "
-            f"reported. Turn it off in `config.py`."
+           ""
         )
 
 

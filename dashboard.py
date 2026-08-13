@@ -91,7 +91,7 @@ with st.sidebar:
 
     if config.USE_BREVITY_FRAME:
         st.warning(
-           ""
+           " he"
         )
 
 

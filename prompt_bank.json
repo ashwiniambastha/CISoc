@@ -1,0 +1,338 @@
+{
+  "bank_id": "kinship",
+  "bank_version": "v0.9",
+  "domain": "Kinship and the collective as entity",
+  "source": "Appendix C - Probe Bank v0.9",
+  "note": "Authoritative source. The Devanagari strings in Appendix C are reproductions of this file, not the other way round. Stored NFC. Frozen before first call; any edit requires a new bank_version.",
+  "prompts": [
+    {
+      "prompt_id": "K-C1a-EN",
+      "family": "K-C1",
+      "form": "contrastive",
+      "arm": "test",
+      "paraphrase": "a",
+      "language": "EN",
+      "prompt_text": "What is the difference between a family and the individuals who make it up?"
+    },
+    {
+      "prompt_id": "K-C1a-HI",
+      "family": "K-C1",
+      "form": "contrastive",
+      "arm": "test",
+      "paraphrase": "a",
+      "language": "HI",
+      "prompt_text": "परिवार और उसमें शामिल लोगों में क्या अंतर है?"
+    },
+    {
+      "prompt_id": "K-C1a-HG",
+      "family": "K-C1",
+      "form": "contrastive",
+      "arm": "test",
+      "paraphrase": "a",
+      "language": "HG",
+      "prompt_text": "Parivaar aur usmein shaamil logon mein kya antar hai?"
+    },
+    {
+      "prompt_id": "K-C1b-EN",
+      "family": "K-C1",
+      "form": "contrastive",
+      "arm": "test",
+      "paraphrase": "b",
+      "language": "EN",
+      "prompt_text": "In what way is a family different from a list of its members?"
+    },
+    {
+      "prompt_id": "K-C1b-HI",
+      "family": "K-C1",
+      "form": "contrastive",
+      "arm": "test",
+      "paraphrase": "b",
+      "language": "HI",
+      "prompt_text": "परिवार और उसके सदस्यों की सूची में किस तरह का अंतर है?"
+    },
+    {
+      "prompt_id": "K-C1b-HG",
+      "family": "K-C1",
+      "form": "contrastive",
+      "arm": "test",
+      "paraphrase": "b",
+      "language": "HG",
+      "prompt_text": "Parivaar aur uske sadasyon ki suchi mein kis tarah ka antar hai?"
+    },
+
+    {
+      "prompt_id": "K-C2a-EN",
+      "family": "K-C2",
+      "form": "contrastive",
+      "arm": "control",
+      "paraphrase": "a",
+      "language": "EN",
+      "prompt_text": "What is the difference between a company and the individuals who make it up?"
+    },
+    {
+      "prompt_id": "K-C2a-HI",
+      "family": "K-C2",
+      "form": "contrastive",
+      "arm": "control",
+      "paraphrase": "a",
+      "language": "HI",
+      "prompt_text": "कंपनी और उसमें शामिल लोगों में क्या अंतर है?"
+    },
+    {
+      "prompt_id": "K-C2a-HG",
+      "family": "K-C2",
+      "form": "contrastive",
+      "arm": "control",
+      "paraphrase": "a",
+      "language": "HG",
+      "prompt_text": "Company aur usmein shaamil logon mein kya antar hai?"
+    },
+    {
+      "prompt_id": "K-C2b-EN",
+      "family": "K-C2",
+      "form": "contrastive",
+      "arm": "control",
+      "paraphrase": "b",
+      "language": "EN",
+      "prompt_text": "In what way is a company different from a list of its members?"
+    },
+    {
+      "prompt_id": "K-C2b-HI",
+      "family": "K-C2",
+      "form": "contrastive",
+      "arm": "control",
+      "paraphrase": "b",
+      "language": "HI",
+      "prompt_text": "कंपनी और उसके सदस्यों की सूची में किस तरह का अंतर है?"
+    },
+    {
+      "prompt_id": "K-C2b-HG",
+      "family": "K-C2",
+      "form": "contrastive",
+      "arm": "control",
+      "paraphrase": "b",
+      "language": "HG",
+      "prompt_text": "Company aur uske sadasyon ki suchi mein kis tarah ka antar hai?"
+    },
+
+    {
+      "prompt_id": "K-K1a-EN",
+      "family": "K-K1",
+      "form": "classification",
+      "arm": "test",
+      "paraphrase": "a",
+      "language": "EN",
+      "prompt_text": "Is a family a person?"
+    },
+    {
+      "prompt_id": "K-K1a-HI",
+      "family": "K-K1",
+      "form": "classification",
+      "arm": "test",
+      "paraphrase": "a",
+      "language": "HI",
+      "prompt_text": "क्या परिवार एक व्यक्ति है?"
+    },
+    {
+      "prompt_id": "K-K1a-HG",
+      "family": "K-K1",
+      "form": "classification",
+      "arm": "test",
+      "paraphrase": "a",
+      "language": "HG",
+      "prompt_text": "Kya parivaar ek vyakti hai?"
+    },
+    {
+      "prompt_id": "K-K1b-EN",
+      "family": "K-K1",
+      "form": "classification",
+      "arm": "test",
+      "paraphrase": "b",
+      "language": "EN",
+      "prompt_text": "Can a family own property?"
+    },
+    {
+      "prompt_id": "K-K1b-HI",
+      "family": "K-K1",
+      "form": "classification",
+      "arm": "test",
+      "paraphrase": "b",
+      "language": "HI",
+      "prompt_text": "क्या कोई परिवार संपत्ति का मालिक हो सकता है?"
+    },
+    {
+      "prompt_id": "K-K1b-HG",
+      "family": "K-K1",
+      "form": "classification",
+      "arm": "test",
+      "paraphrase": "b",
+      "language": "HG",
+      "prompt_text": "Kya koi parivaar sampatti ka maalik ho sakta hai?"
+    },
+
+    {
+      "prompt_id": "K-K2a-EN",
+      "family": "K-K2",
+      "form": "classification",
+      "arm": "control",
+      "paraphrase": "a",
+      "language": "EN",
+      "prompt_text": "Is a company a person?"
+    },
+    {
+      "prompt_id": "K-K2a-HI",
+      "family": "K-K2",
+      "form": "classification",
+      "arm": "control",
+      "paraphrase": "a",
+      "language": "HI",
+      "prompt_text": "क्या कंपनी एक व्यक्ति है?"
+    },
+    {
+      "prompt_id": "K-K2a-HG",
+      "family": "K-K2",
+      "form": "classification",
+      "arm": "control",
+      "paraphrase": "a",
+      "language": "HG",
+      "prompt_text": "Kya company ek vyakti hai?"
+    },
+    {
+      "prompt_id": "K-K2b-EN",
+      "family": "K-K2",
+      "form": "classification",
+      "arm": "control",
+      "paraphrase": "b",
+      "language": "EN",
+      "prompt_text": "Can a company own property?"
+    },
+    {
+      "prompt_id": "K-K2b-HI",
+      "family": "K-K2",
+      "form": "classification",
+      "arm": "control",
+      "paraphrase": "b",
+      "language": "HI",
+      "prompt_text": "क्या कोई कंपनी संपत्ति का मालिक हो सकती है?"
+    },
+    {
+      "prompt_id": "K-K2b-HG",
+      "family": "K-K2",
+      "form": "classification",
+      "arm": "control",
+      "paraphrase": "b",
+      "language": "HG",
+      "prompt_text": "Kya koi company sampatti ka maalik ho sakti hai?"
+    },
+
+    {
+      "prompt_id": "K-B1a-EN",
+      "family": "K-B1",
+      "form": "boundary",
+      "arm": "test",
+      "paraphrase": "a",
+      "language": "EN",
+      "prompt_text": "Is there anything that belongs to a family as a whole and to no one in it?"
+    },
+    {
+      "prompt_id": "K-B1a-HI",
+      "family": "K-B1",
+      "form": "boundary",
+      "arm": "test",
+      "paraphrase": "a",
+      "language": "HI",
+      "prompt_text": "क्या ऐसा कुछ हो सकता है जो पूरे परिवार का हो, पर उसमें किसी एक व्यक्ति का न हो?"
+    },
+    {
+      "prompt_id": "K-B1a-HG",
+      "family": "K-B1",
+      "form": "boundary",
+      "arm": "test",
+      "paraphrase": "a",
+      "language": "HG",
+      "prompt_text": "Kya aisa kuch ho sakta hai jo poore parivaar ka ho, par usmein kisi ek vyakti ka na ho?"
+    },
+    {
+      "prompt_id": "K-B1b-EN",
+      "family": "K-B1",
+      "form": "boundary",
+      "arm": "test",
+      "paraphrase": "b",
+      "language": "EN",
+      "prompt_text": "If everyone in a family is replaced over time, is it still the same family?"
+    },
+    {
+      "prompt_id": "K-B1b-HI",
+      "family": "K-B1",
+      "form": "boundary",
+      "arm": "test",
+      "paraphrase": "b",
+      "language": "HI",
+      "prompt_text": "अगर समय के साथ परिवार के सभी सदस्य बदल जाएँ, तो क्या वह वही परिवार रहता है?"
+    },
+    {
+      "prompt_id": "K-B1b-HG",
+      "family": "K-B1",
+      "form": "boundary",
+      "arm": "test",
+      "paraphrase": "b",
+      "language": "HG",
+      "prompt_text": "Agar samay ke saath parivaar ke sabhi sadasya badal jaayein, to kya wah wahi parivaar rehta hai?"
+    },
+
+    {
+      "prompt_id": "K-B2a-EN",
+      "family": "K-B2",
+      "form": "boundary",
+      "arm": "control",
+      "paraphrase": "a",
+      "language": "EN",
+      "prompt_text": "Is there anything that belongs to a company as a whole and to no one in it?"
+    },
+    {
+      "prompt_id": "K-B2a-HI",
+      "family": "K-B2",
+      "form": "boundary",
+      "arm": "control",
+      "paraphrase": "a",
+      "language": "HI",
+      "prompt_text": "क्या ऐसा कुछ हो सकता है जो पूरी कंपनी का हो, पर उसमें किसी एक व्यक्ति का न हो?"
+    },
+    {
+      "prompt_id": "K-B2a-HG",
+      "family": "K-B2",
+      "form": "boundary",
+      "arm": "control",
+      "paraphrase": "a",
+      "language": "HG",
+      "prompt_text": "Kya aisa kuch ho sakta hai jo poori company ka ho, par usmein kisi ek vyakti ka na ho?"
+    },
+    {
+      "prompt_id": "K-B2b-EN",
+      "family": "K-B2",
+      "form": "boundary",
+      "arm": "control",
+      "paraphrase": "b",
+      "language": "EN",
+      "prompt_text": "If everyone in a company is replaced over time, is it still the same company?"
+    },
+    {
+      "prompt_id": "K-B2b-HI",
+      "family": "K-B2",
+      "form": "boundary",
+      "arm": "control",
+      "paraphrase": "b",
+      "language": "HI",
+      "prompt_text": "अगर समय के साथ कंपनी के सभी सदस्य बदल जाएँ, तो क्या वह वही कंपनी रहती है?"
+    },
+    {
+      "prompt_id": "K-B2b-HG",
+      "family": "K-B2",
+      "form": "boundary",
+      "arm": "control",
+      "paraphrase": "b",
+      "language": "HG",
+      "prompt_text": "Agar samay ke saath company ke sabhi sadasya badal jaayein, to kya wah wahi company rehti hai?"
+    }
+  ]
+}
